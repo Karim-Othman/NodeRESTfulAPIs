@@ -26,18 +26,41 @@ mongoose.connect('mongodb://localhost/Citico', { useNewUrlParser: true })
 
 
 
-    function JoiValidation (body)
+    function JoiValidation (body,schemaType='postSchema')
     {
-    const schema = {
     
-                    TechName:Joi.string().required(),
-                    ARCommName:Joi.string().required(),
-                    ENCommName:Joi.string().required(),
-                    subCategories:Joi.array(),
-                    date:Joi.date(),
-                    isLive:Joi.boolean(),
-                    characteristics:Joi.array()
-    };
+        let schema = {};
+    
+    if (schemaType=='postSchema')
+    {
+    
+         schema ={ 
+                        TechName:Joi.string().required(),
+                        ARCommName:Joi.string().required(),
+                        ENCommName:Joi.string().required(),
+                        subCategories:Joi.array(),
+                        date:Joi.date(),
+                        isLive:Joi.boolean(),
+                        characteristics:Joi.array()
+        };
+    }
+
+    else if (schemaType=='putSchema')
+    {
+    
+         schema ={ 
+                        TechName:Joi.string().required(),
+                        OperationName:Joi.string().required(),
+                        characteristics:Joi.array().when('OperationName', {
+                                is: Joi.string().valid('AddChar','DeleteChar'),
+                                then: Joi.required()
+                              }),
+                        subCategories:Joi.array().when('OperationName', {
+                                is: Joi.string().valid('AddSub','DeleteSub'),
+                                then: Joi.required()
+                              })
+                        };
+    }
 
     return Joi.validate(body,   schema);
 
