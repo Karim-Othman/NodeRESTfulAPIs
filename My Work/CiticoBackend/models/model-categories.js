@@ -6,16 +6,32 @@ mongoose.connect('mongodb://localhost/Citico', { useNewUrlParser: true })
     .catch((err)=>console.error('could not connect to mongo DB',err));
 
 
+    const subCategoriesSchema =new mongoose.Schema({subCatTechName:String,
+    subCatARCommName:String,
+    subCatENCommName:String,
+    isLive:{type:Boolean, default:true}});
+
     const categorySchema= new mongoose.Schema({
 
             TechName: {type:String, required:true},
             ARCommName: {type:String, required:true},
             ENCommName: {type:String, required:true},
-            subCategories:[{subCatTechName:{type:String, required:function(){return this.subCatARCommName}},
-                            subCatARCommName:{type:String, required:function(){return this.subCatENCommName}},
-                            subCatENCommName:{type:String, required:function(){return this.subCatARCommName}},
-                            isLive:{type:Boolean, default:true}
-            }],
+            subCategories:{type:[subCategoriesSchema],
+                        
+                validate: {
+                        validator: function(v){
+                                
+                                for (let i = 0; i < v.length; i++)
+                                {
+                                        if (!SubCatValidationFunction(v[i]))
+                                                return false;
+                                }
+                
+                },
+                        message: 'subCategories is missing one of the following params subCatTechName, subCatARCommName, subCatENCommName'
+                      }
+        
+                        },
             date:{type: Date, default: Date.now},
             isLive: {type:Boolean, default:true},
             characteristics:[String]
@@ -71,3 +87,24 @@ mongoose.connect('mongodb://localhost/Citico', { useNewUrlParser: true })
 
     exports.JoiValidate = JoiValidation;
     exports.categorySchema = categorySchema;
+
+
+    function SubCatValidationFunction({subCatTechName, subCatARCommName, subCatENCommName}){
+
+        
+        if (!subCatTechName){
+
+                return false;
+        }
+        if (!subCatARCommName){
+
+                return false;
+        }
+        if (!subCatENCommName){
+
+                return false;
+        }
+
+        return true;
+
+    }

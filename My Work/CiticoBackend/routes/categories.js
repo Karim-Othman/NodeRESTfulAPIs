@@ -142,7 +142,6 @@ async function CreateCategory (body)
 async function PutHelperFunction ({TechName,OperationName,characteristics,subCategories})
 {
 
-    console.log(TechName,OperationName,characteristics,subCategories);
 
     let RequestArray= null;
     let Key = 'characteristics';
